@@ -1,0 +1,33 @@
+name: remote-screens
+version: '0.3'
+summary: Remote Screens by Oele Geirnaert
+description: |
+ remote screen service
+base: core18
+# grade: stable
+grade: devel
+# confinement: strict
+confinement: devmode
+
+architectures:
+  - build-on: amd64
+    run-on: [amd64, arm64]
+
+apps:
+  service-app:
+    command: bin/hello # from setup.py entry_points
+    plugs: [home,network-bind]
+    daemon: simple
+
+parts:
+  service-app:
+    # plugin: nil
+    plugin: python
+    python-version: python3
+    python-packages: [websocket_client, requests, psutil, Xlib]
+    source: .
+    # stage-packages: [ncbi-blast+]
+    # override-build: |
+    #     snapcraftctl build
+    #     cp $SNAPCRAFT_PART_SRC/src/app.py $SNAPCRAFT_PART_INSTALL/usr/bin/
+    #     chmod +x $SNAPCRAFT_PART_INSTALL/usr/bin/scr/app.py
