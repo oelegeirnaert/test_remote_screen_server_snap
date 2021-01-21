@@ -11,3 +11,5 @@ sudo snap install --dangerous --devmode remotescreens_0.1_amd64.snap
 
 remotescreens.register
 remotescreens.help
+
+snap stop remotescreens

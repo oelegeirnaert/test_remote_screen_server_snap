@@ -22,13 +22,14 @@ apps:
     daemon: simple
     restart-condition: always
 
+  status:
+    command: bin/status # from setup.py entry_points
+    plugs: [home,network-bind]
+
   help:
     command: bin/help # from setup.py entry_points
     plugs: [home,network-bind]
 
-  register:
-    command: bin/register # from setup.py entry_points
-    plugs: [home,network-bind]
 
 parts:
   server:

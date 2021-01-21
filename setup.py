@@ -17,7 +17,7 @@ setuptools.setup(
     entry_points={
         "console_scripts": [
             "help=src.app:help",
-            "register=src.app:register",
+            "status=src.app:status",
             "start=src.app:start",
         ]
     },

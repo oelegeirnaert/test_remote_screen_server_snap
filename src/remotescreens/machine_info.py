@@ -3,6 +3,7 @@ import psutil
 import platform
 from datetime import datetime
 from Xlib import display
+import json
 
 
 def get_snap_info():
@@ -10,12 +11,16 @@ def get_snap_info():
     SNAP_NAME = os.environ.get("SNAP_NAME", "unknown")
     SNAP_REVISION = os.environ.get("SNAP_REVISION", "unknown")
     SNAP_VERSION = os.environ.get("SNAP_VERSION", "unknown")
-    SNAP_PIN = os.environ.get("SNAP_PIN", "unknown")
-    print(f"Arc: {SNAP_ARCH}")
-    print(f"Name: {SNAP_NAME}")
-    print(f"Revision: {SNAP_REVISION}")
-    print(f"Version: {SNAP_VERSION}")
-    print(f"Pin: {SNAP_PIN}")
+
+    info = {
+        "arc": SNAP_ARCH,
+        "name": SNAP_NAME,
+        "revision": SNAP_REVISION,
+        "version": SNAP_VERSION,
+    }
+    print(info)
+
+    return info
 
 
 def get_machine_id():
@@ -48,13 +53,18 @@ def get_size(bytes, suffix="B"):
 def get_platform_info():
     print("=" * 40, "System Information", "=" * 40)
     uname = platform.uname()
-    print(f"System: {uname.system}")
-    print(f"Node Name: {uname.node}")
-    print(f"Release: {uname.release}")
-    print(f"Version: {uname.version}")
-    print(f"Machine: {uname.machine}")
-    print(f"Processor: {uname.processor}")
-    print(f"Machine ID: {get_machine_id()}")
+    info = {
+        "system": uname.system,
+        "node_name": uname.node,
+        "release": uname.release,
+        "version": uname.version,
+        "machine": uname.machine,
+        "processor": uname.processor,
+        "machine_id": get_machine_id(),
+    }
+    print(info)
+
+    return info
 
 
 def get_boot_time_info():
@@ -63,24 +73,32 @@ def get_boot_time_info():
     boot_time_timestamp = psutil.boot_time()
     bt = datetime.fromtimestamp(boot_time_timestamp)
     print(f"Boot Time: {bt.year}/{bt.month}/{bt.day} {bt.hour}:{bt.minute}:{bt.second}")
+    return {"boot_time": str(bt)}
 
 
 def get_cpu_info():
     # let's print CPU information
     print("=" * 40, "CPU Info", "=" * 40)
     # number of cores
-    print("Physical cores:", psutil.cpu_count(logical=False))
-    print("Total cores:", psutil.cpu_count(logical=True))
-    # CPU frequencies
     cpufreq = psutil.cpu_freq()
-    print(f"Max Frequency: {cpufreq.max:.2f}Mhz")
-    print(f"Min Frequency: {cpufreq.min:.2f}Mhz")
-    print(f"Current Frequency: {cpufreq.current:.2f}Mhz")
-    # CPU usage
-    print("CPU Usage Per Core:")
+
+    info = {
+        "physical_cores": psutil.cpu_count(logical=False),
+        "total_cores": psutil.cpu_count(logical=True),
+        "max_frequency": f"{cpufreq.max:.2f}Mhz",
+        "min_frequency": f"{cpufreq.min:.2f}Mhz",
+        "current_frequency": f"{cpufreq.current:.2f}Mhz",
+    }
+
     for i, percentage in enumerate(psutil.cpu_percent(percpu=True, interval=1)):
         print(f"Core {i}: {percentage}%")
+    # CPU usage
+    print("CPU Usage Per Core:")
+
     print(f"Total CPU Usage: {psutil.cpu_percent()}%")
+    print(info)
+
+    return info
 
 
 def get_memory_info():
