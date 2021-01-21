@@ -14,7 +14,13 @@ setuptools.setup(
     # packages=setuptools.find_packages(where="src", exclude=["tests"]),
     package_data={"src": ["description.txt"]},
     install_requires=["websocket-client", "requests", "psutil", "Xlib"],
-    entry_points={"console_scripts": ["hello=src.app:main", "stup=src.app:stup"]},
+    entry_points={
+        "console_scripts": [
+            "help=src.app:help",
+            "register=src.app:register",
+            "start=src.app:start",
+        ]
+    },
     classifiers=[
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 2.7",

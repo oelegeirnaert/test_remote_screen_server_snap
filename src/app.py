@@ -2,32 +2,36 @@
 
 import os, sys
 import subprocess
+import socket
 
 import logging
 import threading
 
+from remotescreens import machine_info
+
+from remotescreens.rs_print import RSPrint
+from remotescreens.remotescreens import RemoteServer
+
 log = logging.getLogger(__name__)
 
 
-def stup():
-    print("mystup!")
+def help():
+    machine_info.get_all_info()
 
 
-def main():
-    from remotescreens.rs_print import RSPrint
-    from remotescreens.remotescreens import RemoteServer
+def register():
+    host = "https://remotescreens.herokuapp.com"
+    if socket.gethostname().lower() == "oeste":
+        host = "http://localhost:8000"
+    rm = RemoteServer(host, machine_info.get_machine_id)
 
-    from remotescreens import machine_info
 
+def start():
     "Run the application"
-
-    print("hello! this is a snap.")
 
     rs = RSPrint()
     rs.print_test()
-    machine_info.get_all_info()
-    rm = RemoteServer("https://remotescreens.herokuapp.com")
 
 
 if __name__ == "__main__":
-    main()
+    register()

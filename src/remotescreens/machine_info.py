@@ -5,6 +5,19 @@ from datetime import datetime
 from Xlib import display
 
 
+def get_snap_info():
+    SNAP_ARCH = os.environ.get("SNAP_ARCH", "unknown")
+    SNAP_NAME = os.environ.get("SNAP_NAME", "unknown")
+    SNAP_REVISION = os.environ.get("SNAP_REVISION", "unknown")
+    SNAP_VERSION = os.environ.get("SNAP_VERSION", "unknown")
+    SNAP_PIN = os.environ.get("SNAP_PIN", "unknown")
+    print(f"Arc: {SNAP_ARCH}")
+    print(f"Name: {SNAP_NAME}")
+    print(f"Revision: {SNAP_REVISION}")
+    print(f"Version: {SNAP_VERSION}")
+    print(f"Pin: {SNAP_PIN}")
+
+
 def get_machine_id():
     try:
         machineId = os.popen("cat /etc/machine-id")
@@ -159,6 +172,7 @@ def get_monitor_info():
 
 
 def get_all_info():
+    get_snap_info()
     get_platform_info()
     get_boot_time_info()
     get_cpu_info()

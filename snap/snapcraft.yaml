@@ -8,6 +8,7 @@ base: core18
 grade: devel
 # confinement: strict
 confinement: devmode
+icon: remote_screens.png
 
 architectures:
   - build-on: amd64
@@ -15,13 +16,22 @@ architectures:
     # run-on: [amd64, arm64]
 
 apps:
-  service-app:
-    command: bin/hello # from setup.py entry_points
+  start:
+    command: bin/start # from setup.py entry_points
     plugs: [home,network-bind]
     daemon: simple
+    restart-condition: always
+
+  help:
+    command: bin/help # from setup.py entry_points
+    plugs: [home,network-bind]
+
+  register:
+    command: bin/register # from setup.py entry_points
+    plugs: [home,network-bind]
 
 parts:
-  service-app:
+  server:
     # plugin: nil
     plugin: python
     python-version: python3

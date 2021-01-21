@@ -7,5 +7,7 @@ cd ~/Documents/snaps/screen_server
 
 snapcraft clean
 snapcraft
-sudo snap install --dangerous --devmode testapp_0.1_amd64.snap
-testapp hello
+sudo snap install --dangerous --devmode remotescreens_0.1_amd64.snap
+
+remotescreens.register
+remotescreens.help
