@@ -23,7 +23,7 @@ def register():
     host = "https://remotescreens.herokuapp.com"
     if socket.gethostname().lower() == "oeste":
         host = "http://localhost:8000"
-    rm = RemoteServer(host, machine_info.get_machine_id)
+    rm = RemoteServer(host, machine_info.get_machine_id())
 
 
 def start():
