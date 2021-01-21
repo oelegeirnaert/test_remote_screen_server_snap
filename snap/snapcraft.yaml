@@ -11,7 +11,7 @@ confinement: devmode
 icon: remote_screens.png
 
 architectures:
-  - build-on: amd64
+  # - build-on: amd64
   - build-on: arm64
     # run-on: [amd64, arm64]
 

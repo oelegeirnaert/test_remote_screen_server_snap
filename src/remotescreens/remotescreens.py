@@ -16,6 +16,9 @@ class RemoteServer(object):
     def format_print(self):
         return "*" * 10
 
+    def print_line(self):
+        print("-" * 100)
+
     def print_info(self, message):
         print(
             f"""
@@ -31,6 +34,18 @@ class RemoteServer(object):
     def status(self):
         self.print_info("Getting Status...")
         answer = self.api_call("status")
+
+        if answer:
+            server_public_key = answer.get("server_public_key")
+            if server_public_key:
+                self.print_info("PLEASE ACTIVATE THIS SERVER")
+
+                self.print_line()
+                url = f"{self.endpoint}?action=activate&server={server_public_key}"
+                msg = "You can activate this server by clicking the following link:"
+                print(msg.upper())
+                print(url)
+                self.print_line()
 
     def api_call(self, action, data=None):
         post_data = {"machine_id": self.machine_id}
@@ -61,8 +76,3 @@ class RemoteServer(object):
                 screen_endpoint = f"{self.host}/screen/setup/{screen_public_key}"
                 print(f"Screen will be pointed to: {screen_endpoint}")
                 # os.system(f"snap set chromium-mir-kiosk url='{screen_endpoint}'")
-
-            server_public_key = answer.get("server_public_key")
-            if server_public_key:
-                url = f"{self.endpoint}?action=activate&server={server_public_key}"
-                print(url)
