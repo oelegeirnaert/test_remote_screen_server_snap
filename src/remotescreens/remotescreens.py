@@ -131,6 +131,10 @@ class RemoteServer(object):
     def start_server(self):
         self.print_info("Starting Server...")
 
+        if self.ws:
+            while self.ws.run_forever():
+                pass
+
     def status(self):
         self.print_info("Getting Status...")
         answer = self.api_call("status")
@@ -146,6 +150,18 @@ class RemoteServer(object):
                 print(msg.upper())
                 print(url)
                 self.print_line()
+
+            if self.ws_connection_endpoint:
+                ws = websocket.create_connection(self.ws_connection_endpoint)
+                ws.send(
+                    json.dumps(
+                        {
+                            "type": "server_status",
+                            "message": {"last_seen": str(datetime.datetime.now()), "message": "Hello World!"},
+                        }
+                    )
+                )
+                ws.close()
 
     def api_call(self, action, data=None):
         post_data = {"machine_id": self.machine_id}
@@ -191,5 +207,3 @@ class RemoteServer(object):
                 )
 
                 self.ws.on_open = on_open
-                while self.ws.run_forever():
-                    pass
