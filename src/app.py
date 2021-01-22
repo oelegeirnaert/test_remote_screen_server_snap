@@ -4,6 +4,7 @@ import os, sys
 import subprocess
 import socket
 
+
 import logging
 import threading
 
@@ -38,4 +39,4 @@ def start():
 
 
 if __name__ == "__main__":
-    status()
+    start()

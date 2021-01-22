@@ -145,15 +145,29 @@ def get_disk_info():
     print(f"Total write: {get_size(disk_io.write_bytes)}")
 
 
-def get_netwerk_info():
+def get_network_info():
     # Network information
     print("=" * 40, "Network Information", "=" * 40)
     # get all network interfaces (virtual and physical)
+    interfaces = []
     if_addrs = psutil.net_if_addrs()
     for interface_name, interface_addresses in if_addrs.items():
         for address in interface_addresses:
+            info = {
+                "address_family": address.family,
+                "interface_name": interface_name,
+                "ip_address": address.address,
+                "netmask": address.netmask,
+                "broadcast_ip": address.broadcast,
+            }
             print(f"=== Interface: {interface_name} ===")
             if str(address.family) == "AddressFamily.AF_INET":
+                info = {
+                    "ip_address": address.address,
+                    "netmask": address.netmask,
+                    "broadcast_ip": address.broadcast,
+                }
+                interfaces.append(info)
                 print(f"  IP Address: {address.address}")
                 print(f"  Netmask: {address.netmask}")
                 print(f"  Broadcast IP: {address.broadcast}")
@@ -165,6 +179,14 @@ def get_netwerk_info():
     net_io = psutil.net_io_counters()
     print(f"Total Bytes Sent: {get_size(net_io.bytes_sent)}")
     print(f"Total Bytes Received: {get_size(net_io.bytes_recv)}")
+
+    info = {
+        "total_bytes_sent": get_size(net_io.bytes_sent),
+        "total_bytes_received": get_size(net_io.bytes_recv),
+        "interfaces": interfaces,
+    }
+
+    return info
 
 
 def get_monitor_info():
@@ -196,5 +218,5 @@ def get_all_info():
     get_cpu_info()
     get_memory_info()
     get_disk_info()
-    get_netwerk_info()
+    get_network_info()
     get_monitor_info()
