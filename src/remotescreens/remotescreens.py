@@ -76,24 +76,14 @@ def on_error(ws, error):
 
 
 def on_close(ws):
-    print("on_close")
     print("connection closed...")
-    wait_seconds = 1
+    wait_seconds = 5
     print(f"retrying in {wait_seconds} seconds.")
     time.sleep(wait_seconds)
 
 
 def on_open(ws):
     print("Connection established")
-
-    def run(*args):
-        while True:
-            time.sleep(60)
-            ws.send(
-                json.dumps({"type": "server_status", "message": {"last_seen": str(datetime.datetime.now())}})
-            )
-
-    thread.start_new_thread(run, ())
 
 
 class RemoteServer(object):
@@ -132,6 +122,24 @@ class RemoteServer(object):
         self.print_info("Starting Server...")
 
         if self.ws:
+
+            def run(*args):
+                while True:
+                    time.sleep(30)
+                    try:
+                        self.ws.send(
+                            json.dumps(
+                                {
+                                    "type": "server_status",
+                                    "message": {"last_seen": str(datetime.datetime.now())},
+                                }
+                            )
+                        )
+                    except Exception as exc:
+                        print(str(exc))
+
+            thread.start_new_thread(run, ())
+
             while self.ws.run_forever():
                 pass
 
