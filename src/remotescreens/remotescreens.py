@@ -6,6 +6,7 @@ import json
 import subprocess
 import datetime
 from ast import literal_eval
+import os
 
 from remotescreens import machine_info
 
@@ -143,10 +144,28 @@ class RemoteServer(object):
             while self.ws.run_forever():
                 pass
 
+    def send_single_message(self, message):
+        print(f"Try to send the following message: {message}")
+        if self.ws_connection_endpoint:
+            try:
+                ws = websocket.create_connection(self.ws_connection_endpoint)
+                ws.send(
+                    json.dumps(
+                        {
+                            "type": "server_status",
+                            "message": {"sent": str(datetime.datetime.now()), "message": message},
+                        }
+                    )
+                )
+                ws.close()
+            except Exception as exc:
+                print(str(exc))
+
     def status(self):
         self.print_info("Getting Status...")
         answer = self.api_call("status")
 
+        command = ""
         if answer:
             server_public_key = answer.get("server_public_key")
             if server_public_key:
@@ -159,17 +178,20 @@ class RemoteServer(object):
                 print(url)
                 self.print_line()
 
-            if self.ws_connection_endpoint:
-                ws = websocket.create_connection(self.ws_connection_endpoint)
-                ws.send(
-                    json.dumps(
-                        {
-                            "type": "server_status",
-                            "message": {"last_seen": str(datetime.datetime.now()), "message": "Hello World!"},
-                        }
-                    )
-                )
-                ws.close()
+            screen_public_key = answer.get("screen_public_key")
+            if screen_public_key:
+                screen_endpoint = f"{self.host}/screen/setup/{screen_public_key}"
+                self.send_single_message(f"Screen will be pointed to: {screen_endpoint}")
+                command = f"snap set wpe-webkit-mir-kiosk url='{screen_endpoint}'"
+                self.send_single_message(command)
+                try:
+                    os.system(command)
+                except Exception as exc:
+                    self.send_single_message(str(exc))
+
+        print("snap install mir-kiosk")
+        print("snap install wpe-webkit-mir-kiosk")
+        print(command)
 
     def api_call(self, action, data=None):
         post_data = {"machine_id": self.machine_id}
@@ -196,12 +218,6 @@ class RemoteServer(object):
         }
         answer = self.api_call(action="register", data=data)
         if answer:
-            screen_public_key = answer.get("screen_public_key")
-            if screen_public_key:
-                screen_endpoint = f"{self.host}/screen/setup/{screen_public_key}"
-                print(f"Screen will be pointed to: {screen_endpoint}")
-                # os.system(f"snap set chromium-mir-kiosk url='{screen_endpoint}'")
-
             self.websocket_id = answer.get("websocket_id")
             if self.websocket_id:
                 self.ws_connection_endpoint = f"{self.ws_endpoint}{self.websocket_id}/"

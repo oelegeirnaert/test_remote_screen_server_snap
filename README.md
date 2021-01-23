@@ -5,6 +5,10 @@ https://forum.snapcraft.io/t/after-upgraded-multipass-to-1-3-0-snapcraft-cannot-
 
 cd ~/Documents/snaps/screen_server
 
+snap install mir-kiosk
+snap set mir-kiosk deamon=true
+snap install wpe-webkit-mir-kiosk
+
 snapcraft clean
 snapcraft
 sudo snap install --dangerous --devmode remotescreens_0.1_amd64.snap
