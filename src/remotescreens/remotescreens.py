@@ -51,24 +51,29 @@ def on_message(ws, message):
             send_error_message(ws=ws, error_message="cannot get a message from json")
             return
 
-        try:
-            command = literal_eval(command)
-        except Exception as exc:
-            send_error_message(ws=ws, error_message="cannot parse to array", exception=exc)
-            return
+        if command.startswith("*"):
+            print("internal command")
+            command = command.replace("*")
+            getattr(RemoteServer, command)
+        else:
+            try:
+                command = literal_eval(command)
+            except Exception as exc:
+                send_error_message(ws=ws, error_message="cannot parse to array", exception=exc)
+                return
 
-        try:
-            out = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-            stdout, stderr = out.communicate()
-            print(f"RESULT: {stdout}")
-            print(f"ERROR: {stderr}")
-            ws.send(
-                json.dumps(
-                    {"type": "command_result", "message": {"result": str(stdout), "error": str(stderr)}}
+            try:
+                out = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                stdout, stderr = out.communicate()
+                print(f"RESULT: {stdout}")
+                print(f"ERROR: {stderr}")
+                ws.send(
+                    json.dumps(
+                        {"type": "command_result", "message": {"result": str(stdout), "error": str(stderr)}}
+                    )
                 )
-            )
-        except Exception as exc:
-            send_error_message(ws=ws, error_message="cannot execute your command", exception=exc)
+            except Exception as exc:
+                send_error_message(ws=ws, error_message="cannot execute your command", exception=exc)
 
 
 def on_error(ws, error):
@@ -165,7 +170,11 @@ class RemoteServer(object):
         self.print_info("Getting Status...")
         answer = self.api_call("status")
 
-        command = ""
+        commands = f"""
+snap install mir-kiosk &&
+snap install wpe-webkit-mir-kiosk &&
+snap set mir-kiosk cursor=none &&
+snap set mir-kiosk deamon=true &&"""
         if answer:
             server_public_key = answer.get("server_public_key")
             if server_public_key:
@@ -182,15 +191,14 @@ class RemoteServer(object):
             if screen_public_key:
                 screen_endpoint = f"{self.host}/screen/setup/{screen_public_key}"
                 self.send_single_message(f"Screen will be pointed to: {screen_endpoint}")
-                command = f"snap set wpe-webkit-mir-kiosk url='{screen_endpoint}'"
+                command = f"snap set wpe-webkit-mir-kiosk url='{screen_endpoint}"
                 self.send_single_message(command)
                 try:
                     os.system(command)
                 except Exception as exc:
                     self.send_single_message(str(exc))
 
-        print("snap install mir-kiosk")
-        print("snap install wpe-webkit-mir-kiosk")
+        print(commands)
         print(command)
 
     def api_call(self, action, data=None):
