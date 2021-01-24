@@ -166,15 +166,23 @@ class RemoteServer(object):
             except Exception as exc:
                 print(str(exc))
 
+    def get_command_translation(self, commands):
+        str_commands = (" && ").join(commands)
+        print(str_commands)
+        return str_commands
+
     def status(self):
         self.print_info("Getting Status...")
         answer = self.api_call("status")
 
-        commands = f"""
-snap install mir-kiosk &&
-snap install wpe-webkit-mir-kiosk &&
-snap set mir-kiosk cursor=none &&
-snap set mir-kiosk deamon=true &&"""
+        commands = [
+            "snap install mir-kiosk",
+            "snap install wpe-webkit-mir-kiosk",
+            "snap install wpe-webkit-mir-kiosk",
+            "snap set mir-kiosk cursor=none",
+            "snap set mir-kiosk deamon=true",
+        ]
+
         if answer:
             server_public_key = answer.get("server_public_key")
             if server_public_key:
@@ -191,15 +199,14 @@ snap set mir-kiosk deamon=true &&"""
             if screen_public_key:
                 screen_endpoint = f"{self.host}/screen/setup/{screen_public_key}"
                 self.send_single_message(f"Screen will be pointed to: {screen_endpoint}")
-                command = f"snap set wpe-webkit-mir-kiosk url='{screen_endpoint}"
-                self.send_single_message(command)
+                commands.append(f"snap set wpe-webkit-mir-kiosk url='{screen_endpoint}'")
                 try:
-                    os.system(command)
+                    os.system(self.get_command_translation(commands))
                 except Exception as exc:
                     self.send_single_message(str(exc))
-
-        print(commands)
-        print(command)
+            else:
+                # do a check if snap is already installed and configured
+                os.system(self.get_command_translation(commands))
 
     def api_call(self, action, data=None):
         post_data = {"machine_id": self.machine_id}
