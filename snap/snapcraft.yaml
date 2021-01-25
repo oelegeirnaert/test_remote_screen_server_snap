@@ -4,10 +4,10 @@ summary: Remote Screens by Oele Geirnaert
 description: |
  remote screen service
 base: core18
-# grade: stable
-grade: devel
-# confinement: strict
-confinement: devmode
+grade: stable
+# grade: devel
+confinement: strict
+# confinement: devmode
 icon: remote_screens.png
 
 architectures:
